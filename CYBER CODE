@@ -1,0 +1,1508 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU",
+    "gpuClass": "standard"
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "MFGIWBEulMbJ"
+      },
+      "outputs": [],
+      "source": [
+        "# Importing the libraries\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "import plotly.express as px"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv('/content/cyberbullying_tweets.csv')\n",
+        "df.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "YZ6nQeAol7si",
+        "outputId": "fcf81c92-278f-4c0b-f63e-27f6410d5c4d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "                                          tweet_text cyberbullying_type\n",
+              "0  In other words #katandandre, your food was cra...  not_cyberbullying\n",
+              "1  Why is #aussietv so white? #MKR #theblock #ImA...  not_cyberbullying\n",
+              "2  @XochitlSuckkks a classy whore? Or more red ve...  not_cyberbullying\n",
+              "3  @Jason_Gio meh. :P  thanks for the heads up, b...  not_cyberbullying\n",
+              "4  @RudhoeEnglish This is an ISIS account pretend...  not_cyberbullying"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-9413c71e-c156-4d76-8935-0ce87f149e99\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>tweet_text</th>\n",
+              "      <th>cyberbullying_type</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>In other words #katandandre, your food was cra...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>Why is #aussietv so white? #MKR #theblock #ImA...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>@XochitlSuckkks a classy whore? Or more red ve...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>@Jason_Gio meh. :P  thanks for the heads up, b...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>@RudhoeEnglish This is an ISIS account pretend...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-9413c71e-c156-4d76-8935-0ce87f149e99')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-9413c71e-c156-4d76-8935-0ce87f149e99 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-9413c71e-c156-4d76-8935-0ce87f149e99');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BTMefLR5mAb9",
+        "outputId": "a2f00b3a-0ec0-4bac-e1ea-cd6ba5d83e2a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 47692 entries, 0 to 47691\n",
+            "Data columns (total 2 columns):\n",
+            " #   Column              Non-Null Count  Dtype \n",
+            "---  ------              --------------  ----- \n",
+            " 0   tweet_text          47692 non-null  object\n",
+            " 1   cyberbullying_type  47692 non-null  object\n",
+            "dtypes: object(2)\n",
+            "memory usage: 745.3+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install demoji"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Z01b1RurnUP1",
+        "outputId": "fde26748-6ebd-45ca-ad47-d602534fc27e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Collecting demoji\n",
+            "  Downloading demoji-1.1.0-py3-none-any.whl (42 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m42.9/42.9 KB\u001b[0m \u001b[31m5.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: demoji\n",
+            "Successfully installed demoji-1.1.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import re\n",
+        "from nltk.corpus import stopwords\n",
+        "from nltk.stem.snowball import SnowballStemmer\n",
+        "import demoji\n",
+        "import string"
+      ],
+      "metadata": {
+        "id": "GM7pnPa-nWmE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import nltk\n",
+        "nltk.download('stopwords')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Fnx5CpXgnmgX",
+        "outputId": "190874fa-6acb-4912-c679-d79f87e23835"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "[nltk_data] Downloading package stopwords to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping corpora/stopwords.zip.\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "STOPWORDS = set(stopwords.words('english'))\n",
+        "STOPWORDS.update(['rt', 'mkr', 'didn', 'bc', 'n', 'm', \n",
+        "                  'im', 'll', 'y', 've', 'u', 'ur', 'don', \n",
+        "                  'p', 't', 's', 'aren', 'kp', 'o', 'kat', \n",
+        "                  'de', 're', 'amp', 'will', 'wa', 'e', 'like'])\n",
+        "stemmer = SnowballStemmer('english')\n",
+        "def clean_text(text):\n",
+        "    \n",
+        "    # Remove Hashtag, Mention, URLs\n",
+        "    pattern = re.compile(r\"(#[A-Za-z0-9]+|@[A-Za-z0-9]+|https?://\\S+|www\\.\\S+|\\S+\\.[a-z]+|RT @)\")\n",
+        "    text = pattern.sub('', text)\n",
+        "    text = \" \".join(text.split())\n",
+        "    \n",
+        "    # Make all text lowercase\n",
+        "    text = text.lower()\n",
+        "    \n",
+        "    # Stemming\n",
+        "    text = \" \".join([stemmer.stem(word) for word in text.split()])\n",
+        "    \n",
+        "    # Removing Punctuations\n",
+        "    remove_punc = re.compile(r\"[%s]\" % re.escape(string.punctuation))\n",
+        "    text = remove_punc.sub('', text)\n",
+        "    \n",
+        "    # Removing stopwords\n",
+        "    text = \" \".join([word for word in str(text).split() if word not in STOPWORDS])\n",
+        "    \n",
+        "    # Taking care of emojis\n",
+        "    emoji = demoji.findall(text)\n",
+        "    for emot in emoji:\n",
+        "        text = re.sub(r\"(%s)\" % (emot), \"_\".join(emoji[emot].split()), text)\n",
+        "\n",
+        "    return text"
+      ],
+      "metadata": {
+        "id": "da81owBnnZ9K"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['cleaned_text'] = df['tweet_text'].apply(lambda text: clean_text(text))  # Applying the cleaning to the text data"
+      ],
+      "metadata": {
+        "id": "UbORLX7Inqor"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 250
+        },
+        "id": "Bj9par2TnuQW",
+        "outputId": "abfe90e0-2552-479a-8ce9-9d455f953dfe"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "                                          tweet_text cyberbullying_type  \\\n",
+              "0  In other words #katandandre, your food was cra...  not_cyberbullying   \n",
+              "1  Why is #aussietv so white? #MKR #theblock #ImA...  not_cyberbullying   \n",
+              "2  @XochitlSuckkks a classy whore? Or more red ve...  not_cyberbullying   \n",
+              "3  @Jason_Gio meh. :P  thanks for the heads up, b...  not_cyberbullying   \n",
+              "4  @RudhoeEnglish This is an ISIS account pretend...  not_cyberbullying   \n",
+              "\n",
+              "                                        cleaned_text  \n",
+              "0                             word food crapilicious  \n",
+              "1                                          whi white  \n",
+              "2                   classi whore red velvet cupcakes  \n",
+              "3  gio meh thank head concern anoth angri dude tw...  \n",
+              "4     isi account pretend kurdish account islam lies  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-c0415684-0295-4e02-88e7-4482eca687c9\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>tweet_text</th>\n",
+              "      <th>cyberbullying_type</th>\n",
+              "      <th>cleaned_text</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>In other words #katandandre, your food was cra...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "      <td>word food crapilicious</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>Why is #aussietv so white? #MKR #theblock #ImA...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "      <td>whi white</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>@XochitlSuckkks a classy whore? Or more red ve...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "      <td>classi whore red velvet cupcakes</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>@Jason_Gio meh. :P  thanks for the heads up, b...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "      <td>gio meh thank head concern anoth angri dude tw...</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>@RudhoeEnglish This is an ISIS account pretend...</td>\n",
+              "      <td>not_cyberbullying</td>\n",
+              "      <td>isi account pretend kurdish account islam lies</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-c0415684-0295-4e02-88e7-4482eca687c9')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-c0415684-0295-4e02-88e7-4482eca687c9 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-c0415684-0295-4e02-88e7-4482eca687c9');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.isnull().sum() "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9HsoP36Hn3Js",
+        "outputId": "8ff94e32-5d3f-4295-e784-e9cfae09bf97"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tweet_text            0\n",
+              "cyberbullying_type    0\n",
+              "cleaned_text          0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 11
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['cleaned_text'].duplicated().sum() # Checking for duplicate values"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pxLDg9PLn61u",
+        "outputId": "dcb2b2c4-e8ee-440d-ec4d-071146a7a158"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2887"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.drop_duplicates(\"cleaned_text\", inplace = True)"
+      ],
+      "metadata": {
+        "id": "CPc0HfeTn-7m"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['cleaned_text'].str.isspace().sum()     # Checking for tweets with only whitespaces"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xHjNcUOKoDW4",
+        "outputId": "319ecfe7-13bd-450e-9abb-ae511d98c10e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = df[df[\"cyberbullying_type\"]!=\"other_cyberbullying\"]"
+      ],
+      "metadata": {
+        "id": "sprNxpLzoGXv"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df['cyberbullying_type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "IDeilDfntHoH",
+        "outputId": "9f69ba83-2e64-4302-c8db-82dd50ae780e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "religion             7946\n",
+              "age                  7887\n",
+              "ethnicity            7797\n",
+              "not_cyberbullying    7670\n",
+              "gender               7637\n",
+              "Name: cyberbullying_type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sns.countplot(data = df, x = 'cyberbullying_type')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 298
+        },
+        "id": "SSkdBitGtJ6A",
+        "outputId": "051b7697-13f8-4e13-b295-e082a47d0e23"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<Axes: xlabel='cyberbullying_type', ylabel='count'>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 432x288 with 1 Axes>"
+            ],
+            "image/png": "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\n"
+          },
+          "metadata": {
+            "needs_background": "light"
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Plotting the top 15 words of each cyberbullying type\n",
+        "for cyber_type in df.cyberbullying_type.unique():\n",
+        "    \n",
+        "    top50_word = df.cleaned_text[df.cyberbullying_type==cyber_type].str.split(expand=True).stack().value_counts()[:15]\n",
+        "    \n",
+        "    fig = px.bar(top50_word, color=top50_word.values, color_continuous_scale=px.colors.sequential.RdPu, custom_data=[top50_word.values])\n",
+        "    fig.update_traces(marker_color='red')\n",
+        "    fig.update_traces(hovertemplate='<b>Count: </b>%{customdata[0]}')\n",
+        "    fig.update_layout(title=f\"Top 15 words for {cyber_type}\",\n",
+        "                     template='simple_white',\n",
+        "                     hovermode='x unified')\n",
+        "    fig.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        },
+        "id": "mNd7fvAqtMKt",
+        "outputId": "24b66d0e-7ab0-44f3-f467-0810a0731c36"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/html": [
+              "<html>\n",
+              "<head><meta charset=\"utf-8\" /></head>\n",
+              "<body>\n",
+              "    <div>            <script src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG\"></script><script type=\"text/javascript\">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}</script>                <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n",
+              "        <script src=\"https://cdn.plot.ly/plotly-2.18.2.min.js\"></script>                <div id=\"6d947735-fa8e-4853-8e89-e51eeddace7b\" class=\"plotly-graph-div\" style=\"height:525px; width:100%;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById(\"6d947735-fa8e-4853-8e89-e51eeddace7b\")) {                    Plotly.newPlot(                        \"6d947735-fa8e-4853-8e89-e51eeddace7b\",                        [{\"alignmentgroup\":\"True\",\"customdata\":[[819],[421],[390],[372],[358],[263],[239],[238],[225],[219],[217],[204],[204],[187],[186]],\"hovertemplate\":\"<b>Count: </b>%{customdata[0]}\",\"legendgroup\":\"\",\"marker\":{\"color\":\"red\",\"coloraxis\":\"coloraxis\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"offsetgroup\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"bulli\",\"get\",\"go\",\"dont\",\"school\",\"one\",\"peopl\",\"think\",\"know\",\"make\",\"time\",\"would\",\"love\",\"need\",\"see\"],\"xaxis\":\"x\",\"y\":[819,421,390,372,358,263,239,238,225,219,217,204,204,187,186],\"yaxis\":\"y\",\"type\":\"bar\"}],                        {\"template\":{\"data\":{\"barpolar\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"barpolar\"}],\"bar\":[{\"error_x\":{\"color\":\"rgb(36,36,36)\"},\"error_y\":{\"color\":\"rgb(36,36,36)\"},\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"bar\"}],\"carpet\":[{\"aaxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"baxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"type\":\"carpet\"}],\"choropleth\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"choropleth\"}],\"contourcarpet\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"contourcarpet\"}],\"contour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"contour\"}],\"heatmapgl\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmapgl\"}],\"heatmap\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmap\"}],\"histogram2dcontour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2dcontour\"}],\"histogram2d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2d\"}],\"histogram\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.6}},\"type\":\"histogram\"}],\"mesh3d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"mesh3d\"}],\"parcoords\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"parcoords\"}],\"pie\":[{\"automargin\":true,\"type\":\"pie\"}],\"scatter3d\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatter3d\"}],\"scattercarpet\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattercarpet\"}],\"scattergeo\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergeo\"}],\"scattergl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergl\"}],\"scattermapbox\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattermapbox\"}],\"scatterpolargl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolargl\"}],\"scatterpolar\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolar\"}],\"scatter\":[{\"fillpattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2},\"type\":\"scatter\"}],\"scatterternary\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterternary\"}],\"surface\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"surface\"}],\"table\":[{\"cells\":{\"fill\":{\"color\":\"rgb(237,237,237)\"},\"line\":{\"color\":\"white\"}},\"header\":{\"fill\":{\"color\":\"rgb(217,217,217)\"},\"line\":{\"color\":\"white\"}},\"type\":\"table\"}]},\"layout\":{\"annotationdefaults\":{\"arrowhead\":0,\"arrowwidth\":1},\"autotypenumbers\":\"strict\",\"coloraxis\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"colorscale\":{\"diverging\":[[0.0,\"rgb(103,0,31)\"],[0.1,\"rgb(178,24,43)\"],[0.2,\"rgb(214,96,77)\"],[0.3,\"rgb(244,165,130)\"],[0.4,\"rgb(253,219,199)\"],[0.5,\"rgb(247,247,247)\"],[0.6,\"rgb(209,229,240)\"],[0.7,\"rgb(146,197,222)\"],[0.8,\"rgb(67,147,195)\"],[0.9,\"rgb(33,102,172)\"],[1.0,\"rgb(5,48,97)\"]],\"sequential\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"sequentialminus\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]]},\"colorway\":[\"#1F77B4\",\"#FF7F0E\",\"#2CA02C\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\",\"#7F7F7F\",\"#BCBD22\",\"#17BECF\"],\"font\":{\"color\":\"rgb(36,36,36)\"},\"geo\":{\"bgcolor\":\"white\",\"lakecolor\":\"white\",\"landcolor\":\"white\",\"showlakes\":true,\"showland\":true,\"subunitcolor\":\"white\"},\"hoverlabel\":{\"align\":\"left\"},\"hovermode\":\"closest\",\"mapbox\":{\"style\":\"light\"},\"paper_bgcolor\":\"white\",\"plot_bgcolor\":\"white\",\"polar\":{\"angularaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"radialaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"scene\":{\"xaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"zaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}},\"shapedefaults\":{\"fillcolor\":\"black\",\"line\":{\"width\":0},\"opacity\":0.3},\"ternary\":{\"aaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"baxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"caxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"title\":{\"x\":0.05},\"xaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}}},\"xaxis\":{\"anchor\":\"y\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"index\"}},\"yaxis\":{\"anchor\":\"x\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"value\"}},\"coloraxis\":{\"colorbar\":{\"title\":{\"text\":\"color\"}},\"colorscale\":[[0.0,\"rgb(255,247,243)\"],[0.125,\"rgb(253,224,221)\"],[0.25,\"rgb(252,197,192)\"],[0.375,\"rgb(250,159,181)\"],[0.5,\"rgb(247,104,161)\"],[0.625,\"rgb(221,52,151)\"],[0.75,\"rgb(174,1,126)\"],[0.875,\"rgb(122,1,119)\"],[1.0,\"rgb(73,0,106)\"]]},\"legend\":{\"tracegroupgap\":0},\"margin\":{\"t\":60},\"barmode\":\"relative\",\"title\":{\"text\":\"Top 15 words for not_cyberbullying\"},\"hovermode\":\"x unified\"},                        {\"responsive\": true}                    ).then(function(){\n",
+              "                            \n",
+              "var gd = document.getElementById('6d947735-fa8e-4853-8e89-e51eeddace7b');\n",
+              "var x = new MutationObserver(function (mutations, observer) {{\n",
+              "        var display = window.getComputedStyle(gd).display;\n",
+              "        if (!display || display === 'none') {{\n",
+              "            console.log([gd, 'removed!']);\n",
+              "            Plotly.purge(gd);\n",
+              "            observer.disconnect();\n",
+              "        }}\n",
+              "}});\n",
+              "\n",
+              "// Listen for the removal of the full notebook cells\n",
+              "var notebookContainer = gd.closest('#notebook-container');\n",
+              "if (notebookContainer) {{\n",
+              "    x.observe(notebookContainer, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "// Listen for the clearing of the current output cell\n",
+              "var outputEl = gd.closest('.output');\n",
+              "if (outputEl) {{\n",
+              "    x.observe(outputEl, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "                        })                };                            </script>        </div>\n",
+              "</body>\n",
+              "</html>"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/html": [
+              "<html>\n",
+              "<head><meta charset=\"utf-8\" /></head>\n",
+              "<body>\n",
+              "    <div>            <script src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG\"></script><script type=\"text/javascript\">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}</script>                <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n",
+              "        <script src=\"https://cdn.plot.ly/plotly-2.18.2.min.js\"></script>                <div id=\"882f8ace-90dd-4323-88cf-5e21abc9d712\" class=\"plotly-graph-div\" style=\"height:525px; width:100%;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById(\"882f8ace-90dd-4323-88cf-5e21abc9d712\")) {                    Plotly.newPlot(                        \"882f8ace-90dd-4323-88cf-5e21abc9d712\",                        [{\"alignmentgroup\":\"True\",\"customdata\":[[3992],[3943],[3630],[1394],[1277],[1171],[968],[953],[945],[899],[889],[801],[605],[592],[579]],\"hovertemplate\":\"<b>Count: </b>%{customdata[0]}\",\"legendgroup\":\"\",\"marker\":{\"color\":\"red\",\"coloraxis\":\"coloraxis\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"offsetgroup\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"rape\",\"joke\",\"gay\",\"call\",\"make\",\"jokes\",\"bitch\",\"femal\",\"sexist\",\"dont\",\"women\",\"peopl\",\"men\",\"think\",\"say\"],\"xaxis\":\"x\",\"y\":[3992,3943,3630,1394,1277,1171,968,953,945,899,889,801,605,592,579],\"yaxis\":\"y\",\"type\":\"bar\"}],                        {\"template\":{\"data\":{\"barpolar\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"barpolar\"}],\"bar\":[{\"error_x\":{\"color\":\"rgb(36,36,36)\"},\"error_y\":{\"color\":\"rgb(36,36,36)\"},\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"bar\"}],\"carpet\":[{\"aaxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"baxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"type\":\"carpet\"}],\"choropleth\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"choropleth\"}],\"contourcarpet\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"contourcarpet\"}],\"contour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"contour\"}],\"heatmapgl\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmapgl\"}],\"heatmap\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmap\"}],\"histogram2dcontour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2dcontour\"}],\"histogram2d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2d\"}],\"histogram\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.6}},\"type\":\"histogram\"}],\"mesh3d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"mesh3d\"}],\"parcoords\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"parcoords\"}],\"pie\":[{\"automargin\":true,\"type\":\"pie\"}],\"scatter3d\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatter3d\"}],\"scattercarpet\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattercarpet\"}],\"scattergeo\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergeo\"}],\"scattergl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergl\"}],\"scattermapbox\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattermapbox\"}],\"scatterpolargl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolargl\"}],\"scatterpolar\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolar\"}],\"scatter\":[{\"fillpattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2},\"type\":\"scatter\"}],\"scatterternary\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterternary\"}],\"surface\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"surface\"}],\"table\":[{\"cells\":{\"fill\":{\"color\":\"rgb(237,237,237)\"},\"line\":{\"color\":\"white\"}},\"header\":{\"fill\":{\"color\":\"rgb(217,217,217)\"},\"line\":{\"color\":\"white\"}},\"type\":\"table\"}]},\"layout\":{\"annotationdefaults\":{\"arrowhead\":0,\"arrowwidth\":1},\"autotypenumbers\":\"strict\",\"coloraxis\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"colorscale\":{\"diverging\":[[0.0,\"rgb(103,0,31)\"],[0.1,\"rgb(178,24,43)\"],[0.2,\"rgb(214,96,77)\"],[0.3,\"rgb(244,165,130)\"],[0.4,\"rgb(253,219,199)\"],[0.5,\"rgb(247,247,247)\"],[0.6,\"rgb(209,229,240)\"],[0.7,\"rgb(146,197,222)\"],[0.8,\"rgb(67,147,195)\"],[0.9,\"rgb(33,102,172)\"],[1.0,\"rgb(5,48,97)\"]],\"sequential\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"sequentialminus\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]]},\"colorway\":[\"#1F77B4\",\"#FF7F0E\",\"#2CA02C\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\",\"#7F7F7F\",\"#BCBD22\",\"#17BECF\"],\"font\":{\"color\":\"rgb(36,36,36)\"},\"geo\":{\"bgcolor\":\"white\",\"lakecolor\":\"white\",\"landcolor\":\"white\",\"showlakes\":true,\"showland\":true,\"subunitcolor\":\"white\"},\"hoverlabel\":{\"align\":\"left\"},\"hovermode\":\"closest\",\"mapbox\":{\"style\":\"light\"},\"paper_bgcolor\":\"white\",\"plot_bgcolor\":\"white\",\"polar\":{\"angularaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"radialaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"scene\":{\"xaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"zaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}},\"shapedefaults\":{\"fillcolor\":\"black\",\"line\":{\"width\":0},\"opacity\":0.3},\"ternary\":{\"aaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"baxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"caxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"title\":{\"x\":0.05},\"xaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}}},\"xaxis\":{\"anchor\":\"y\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"index\"}},\"yaxis\":{\"anchor\":\"x\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"value\"}},\"coloraxis\":{\"colorbar\":{\"title\":{\"text\":\"color\"}},\"colorscale\":[[0.0,\"rgb(255,247,243)\"],[0.125,\"rgb(253,224,221)\"],[0.25,\"rgb(252,197,192)\"],[0.375,\"rgb(250,159,181)\"],[0.5,\"rgb(247,104,161)\"],[0.625,\"rgb(221,52,151)\"],[0.75,\"rgb(174,1,126)\"],[0.875,\"rgb(122,1,119)\"],[1.0,\"rgb(73,0,106)\"]]},\"legend\":{\"tracegroupgap\":0},\"margin\":{\"t\":60},\"barmode\":\"relative\",\"title\":{\"text\":\"Top 15 words for gender\"},\"hovermode\":\"x unified\"},                        {\"responsive\": true}                    ).then(function(){\n",
+              "                            \n",
+              "var gd = document.getElementById('882f8ace-90dd-4323-88cf-5e21abc9d712');\n",
+              "var x = new MutationObserver(function (mutations, observer) {{\n",
+              "        var display = window.getComputedStyle(gd).display;\n",
+              "        if (!display || display === 'none') {{\n",
+              "            console.log([gd, 'removed!']);\n",
+              "            Plotly.purge(gd);\n",
+              "            observer.disconnect();\n",
+              "        }}\n",
+              "}});\n",
+              "\n",
+              "// Listen for the removal of the full notebook cells\n",
+              "var notebookContainer = gd.closest('#notebook-container');\n",
+              "if (notebookContainer) {{\n",
+              "    x.observe(notebookContainer, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "// Listen for the clearing of the current output cell\n",
+              "var outputEl = gd.closest('.output');\n",
+              "if (outputEl) {{\n",
+              "    x.observe(outputEl, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "                        })                };                            </script>        </div>\n",
+              "</body>\n",
+              "</html>"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/html": [
+              "<html>\n",
+              "<head><meta charset=\"utf-8\" /></head>\n",
+              "<body>\n",
+              "    <div>            <script src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG\"></script><script type=\"text/javascript\">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}</script>                <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n",
+              "        <script src=\"https://cdn.plot.ly/plotly-2.18.2.min.js\"></script>                <div id=\"2756d198-2acc-4e53-ac00-94732f13f947\" class=\"plotly-graph-div\" style=\"height:525px; width:100%;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById(\"2756d198-2acc-4e53-ac00-94732f13f947\")) {                    Plotly.newPlot(                        \"2756d198-2acc-4e53-ac00-94732f13f947\",                        [{\"alignmentgroup\":\"True\",\"customdata\":[[4082],[2732],[2281],[1893],[1227],[1218],[1188],[1179],[1017],[939],[912],[827],[790],[758],[672]],\"hovertemplate\":\"<b>Count: </b>%{customdata[0]}\",\"legendgroup\":\"\",\"marker\":{\"color\":\"red\",\"coloraxis\":\"coloraxis\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"offsetgroup\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"muslim\",\"idiot\",\"islam\",\"christian\",\"support\",\"right\",\"dont\",\"terrorist\",\"radic\",\"peopl\",\"woman\",\"terror\",\"say\",\"know\",\"whi\"],\"xaxis\":\"x\",\"y\":[4082,2732,2281,1893,1227,1218,1188,1179,1017,939,912,827,790,758,672],\"yaxis\":\"y\",\"type\":\"bar\"}],                        {\"template\":{\"data\":{\"barpolar\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"barpolar\"}],\"bar\":[{\"error_x\":{\"color\":\"rgb(36,36,36)\"},\"error_y\":{\"color\":\"rgb(36,36,36)\"},\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"bar\"}],\"carpet\":[{\"aaxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"baxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"type\":\"carpet\"}],\"choropleth\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"choropleth\"}],\"contourcarpet\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"contourcarpet\"}],\"contour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"contour\"}],\"heatmapgl\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmapgl\"}],\"heatmap\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmap\"}],\"histogram2dcontour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2dcontour\"}],\"histogram2d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2d\"}],\"histogram\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.6}},\"type\":\"histogram\"}],\"mesh3d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"mesh3d\"}],\"parcoords\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"parcoords\"}],\"pie\":[{\"automargin\":true,\"type\":\"pie\"}],\"scatter3d\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatter3d\"}],\"scattercarpet\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattercarpet\"}],\"scattergeo\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergeo\"}],\"scattergl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergl\"}],\"scattermapbox\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattermapbox\"}],\"scatterpolargl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolargl\"}],\"scatterpolar\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolar\"}],\"scatter\":[{\"fillpattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2},\"type\":\"scatter\"}],\"scatterternary\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterternary\"}],\"surface\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"surface\"}],\"table\":[{\"cells\":{\"fill\":{\"color\":\"rgb(237,237,237)\"},\"line\":{\"color\":\"white\"}},\"header\":{\"fill\":{\"color\":\"rgb(217,217,217)\"},\"line\":{\"color\":\"white\"}},\"type\":\"table\"}]},\"layout\":{\"annotationdefaults\":{\"arrowhead\":0,\"arrowwidth\":1},\"autotypenumbers\":\"strict\",\"coloraxis\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"colorscale\":{\"diverging\":[[0.0,\"rgb(103,0,31)\"],[0.1,\"rgb(178,24,43)\"],[0.2,\"rgb(214,96,77)\"],[0.3,\"rgb(244,165,130)\"],[0.4,\"rgb(253,219,199)\"],[0.5,\"rgb(247,247,247)\"],[0.6,\"rgb(209,229,240)\"],[0.7,\"rgb(146,197,222)\"],[0.8,\"rgb(67,147,195)\"],[0.9,\"rgb(33,102,172)\"],[1.0,\"rgb(5,48,97)\"]],\"sequential\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"sequentialminus\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]]},\"colorway\":[\"#1F77B4\",\"#FF7F0E\",\"#2CA02C\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\",\"#7F7F7F\",\"#BCBD22\",\"#17BECF\"],\"font\":{\"color\":\"rgb(36,36,36)\"},\"geo\":{\"bgcolor\":\"white\",\"lakecolor\":\"white\",\"landcolor\":\"white\",\"showlakes\":true,\"showland\":true,\"subunitcolor\":\"white\"},\"hoverlabel\":{\"align\":\"left\"},\"hovermode\":\"closest\",\"mapbox\":{\"style\":\"light\"},\"paper_bgcolor\":\"white\",\"plot_bgcolor\":\"white\",\"polar\":{\"angularaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"radialaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"scene\":{\"xaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"zaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}},\"shapedefaults\":{\"fillcolor\":\"black\",\"line\":{\"width\":0},\"opacity\":0.3},\"ternary\":{\"aaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"baxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"caxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"title\":{\"x\":0.05},\"xaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}}},\"xaxis\":{\"anchor\":\"y\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"index\"}},\"yaxis\":{\"anchor\":\"x\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"value\"}},\"coloraxis\":{\"colorbar\":{\"title\":{\"text\":\"color\"}},\"colorscale\":[[0.0,\"rgb(255,247,243)\"],[0.125,\"rgb(253,224,221)\"],[0.25,\"rgb(252,197,192)\"],[0.375,\"rgb(250,159,181)\"],[0.5,\"rgb(247,104,161)\"],[0.625,\"rgb(221,52,151)\"],[0.75,\"rgb(174,1,126)\"],[0.875,\"rgb(122,1,119)\"],[1.0,\"rgb(73,0,106)\"]]},\"legend\":{\"tracegroupgap\":0},\"margin\":{\"t\":60},\"barmode\":\"relative\",\"title\":{\"text\":\"Top 15 words for religion\"},\"hovermode\":\"x unified\"},                        {\"responsive\": true}                    ).then(function(){\n",
+              "                            \n",
+              "var gd = document.getElementById('2756d198-2acc-4e53-ac00-94732f13f947');\n",
+              "var x = new MutationObserver(function (mutations, observer) {{\n",
+              "        var display = window.getComputedStyle(gd).display;\n",
+              "        if (!display || display === 'none') {{\n",
+              "            console.log([gd, 'removed!']);\n",
+              "            Plotly.purge(gd);\n",
+              "            observer.disconnect();\n",
+              "        }}\n",
+              "}});\n",
+              "\n",
+              "// Listen for the removal of the full notebook cells\n",
+              "var notebookContainer = gd.closest('#notebook-container');\n",
+              "if (notebookContainer) {{\n",
+              "    x.observe(notebookContainer, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "// Listen for the clearing of the current output cell\n",
+              "var outputEl = gd.closest('.output');\n",
+              "if (outputEl) {{\n",
+              "    x.observe(outputEl, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "                        })                };                            </script>        </div>\n",
+              "</body>\n",
+              "</html>"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/html": [
+              "<html>\n",
+              "<head><meta charset=\"utf-8\" /></head>\n",
+              "<body>\n",
+              "    <div>            <script src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG\"></script><script type=\"text/javascript\">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}</script>                <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n",
+              "        <script src=\"https://cdn.plot.ly/plotly-2.18.2.min.js\"></script>                <div id=\"f5c7846c-246c-439e-9f5e-3fb371f90af8\" class=\"plotly-graph-div\" style=\"height:525px; width:100%;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById(\"f5c7846c-246c-439e-9f5e-3fb371f90af8\")) {                    Plotly.newPlot(                        \"f5c7846c-246c-439e-9f5e-3fb371f90af8\",                        [{\"alignmentgroup\":\"True\",\"customdata\":[[8312],[7817],[4858],[4393],[1047],[1028],[846],[840],[814],[725],[709],[635],[625],[545],[544]],\"hovertemplate\":\"<b>Count: </b>%{customdata[0]}\",\"legendgroup\":\"\",\"marker\":{\"color\":\"red\",\"coloraxis\":\"coloraxis\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"offsetgroup\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"school\",\"bulli\",\"high\",\"girl\",\"get\",\"one\",\"becaus\",\"peopl\",\"got\",\"kid\",\"middl\",\"would\",\"dont\",\"go\",\"friend\"],\"xaxis\":\"x\",\"y\":[8312,7817,4858,4393,1047,1028,846,840,814,725,709,635,625,545,544],\"yaxis\":\"y\",\"type\":\"bar\"}],                        {\"template\":{\"data\":{\"barpolar\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"barpolar\"}],\"bar\":[{\"error_x\":{\"color\":\"rgb(36,36,36)\"},\"error_y\":{\"color\":\"rgb(36,36,36)\"},\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"bar\"}],\"carpet\":[{\"aaxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"baxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"type\":\"carpet\"}],\"choropleth\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"choropleth\"}],\"contourcarpet\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"contourcarpet\"}],\"contour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"contour\"}],\"heatmapgl\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmapgl\"}],\"heatmap\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmap\"}],\"histogram2dcontour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2dcontour\"}],\"histogram2d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2d\"}],\"histogram\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.6}},\"type\":\"histogram\"}],\"mesh3d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"mesh3d\"}],\"parcoords\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"parcoords\"}],\"pie\":[{\"automargin\":true,\"type\":\"pie\"}],\"scatter3d\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatter3d\"}],\"scattercarpet\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattercarpet\"}],\"scattergeo\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergeo\"}],\"scattergl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergl\"}],\"scattermapbox\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattermapbox\"}],\"scatterpolargl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolargl\"}],\"scatterpolar\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolar\"}],\"scatter\":[{\"fillpattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2},\"type\":\"scatter\"}],\"scatterternary\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterternary\"}],\"surface\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"surface\"}],\"table\":[{\"cells\":{\"fill\":{\"color\":\"rgb(237,237,237)\"},\"line\":{\"color\":\"white\"}},\"header\":{\"fill\":{\"color\":\"rgb(217,217,217)\"},\"line\":{\"color\":\"white\"}},\"type\":\"table\"}]},\"layout\":{\"annotationdefaults\":{\"arrowhead\":0,\"arrowwidth\":1},\"autotypenumbers\":\"strict\",\"coloraxis\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"colorscale\":{\"diverging\":[[0.0,\"rgb(103,0,31)\"],[0.1,\"rgb(178,24,43)\"],[0.2,\"rgb(214,96,77)\"],[0.3,\"rgb(244,165,130)\"],[0.4,\"rgb(253,219,199)\"],[0.5,\"rgb(247,247,247)\"],[0.6,\"rgb(209,229,240)\"],[0.7,\"rgb(146,197,222)\"],[0.8,\"rgb(67,147,195)\"],[0.9,\"rgb(33,102,172)\"],[1.0,\"rgb(5,48,97)\"]],\"sequential\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"sequentialminus\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]]},\"colorway\":[\"#1F77B4\",\"#FF7F0E\",\"#2CA02C\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\",\"#7F7F7F\",\"#BCBD22\",\"#17BECF\"],\"font\":{\"color\":\"rgb(36,36,36)\"},\"geo\":{\"bgcolor\":\"white\",\"lakecolor\":\"white\",\"landcolor\":\"white\",\"showlakes\":true,\"showland\":true,\"subunitcolor\":\"white\"},\"hoverlabel\":{\"align\":\"left\"},\"hovermode\":\"closest\",\"mapbox\":{\"style\":\"light\"},\"paper_bgcolor\":\"white\",\"plot_bgcolor\":\"white\",\"polar\":{\"angularaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"radialaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"scene\":{\"xaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"zaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}},\"shapedefaults\":{\"fillcolor\":\"black\",\"line\":{\"width\":0},\"opacity\":0.3},\"ternary\":{\"aaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"baxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"caxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"title\":{\"x\":0.05},\"xaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}}},\"xaxis\":{\"anchor\":\"y\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"index\"}},\"yaxis\":{\"anchor\":\"x\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"value\"}},\"coloraxis\":{\"colorbar\":{\"title\":{\"text\":\"color\"}},\"colorscale\":[[0.0,\"rgb(255,247,243)\"],[0.125,\"rgb(253,224,221)\"],[0.25,\"rgb(252,197,192)\"],[0.375,\"rgb(250,159,181)\"],[0.5,\"rgb(247,104,161)\"],[0.625,\"rgb(221,52,151)\"],[0.75,\"rgb(174,1,126)\"],[0.875,\"rgb(122,1,119)\"],[1.0,\"rgb(73,0,106)\"]]},\"legend\":{\"tracegroupgap\":0},\"margin\":{\"t\":60},\"barmode\":\"relative\",\"title\":{\"text\":\"Top 15 words for age\"},\"hovermode\":\"x unified\"},                        {\"responsive\": true}                    ).then(function(){\n",
+              "                            \n",
+              "var gd = document.getElementById('f5c7846c-246c-439e-9f5e-3fb371f90af8');\n",
+              "var x = new MutationObserver(function (mutations, observer) {{\n",
+              "        var display = window.getComputedStyle(gd).display;\n",
+              "        if (!display || display === 'none') {{\n",
+              "            console.log([gd, 'removed!']);\n",
+              "            Plotly.purge(gd);\n",
+              "            observer.disconnect();\n",
+              "        }}\n",
+              "}});\n",
+              "\n",
+              "// Listen for the removal of the full notebook cells\n",
+              "var notebookContainer = gd.closest('#notebook-container');\n",
+              "if (notebookContainer) {{\n",
+              "    x.observe(notebookContainer, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "// Listen for the clearing of the current output cell\n",
+              "var outputEl = gd.closest('.output');\n",
+              "if (outputEl) {{\n",
+              "    x.observe(outputEl, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "                        })                };                            </script>        </div>\n",
+              "</body>\n",
+              "</html>"
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/html": [
+              "<html>\n",
+              "<head><meta charset=\"utf-8\" /></head>\n",
+              "<body>\n",
+              "    <div>            <script src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG\"></script><script type=\"text/javascript\">if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: \"STIX-Web\"}});}</script>                <script type=\"text/javascript\">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>\n",
+              "        <script src=\"https://cdn.plot.ly/plotly-2.18.2.min.js\"></script>                <div id=\"ab736028-8c14-4afb-a863-c412e744de3c\" class=\"plotly-graph-div\" style=\"height:525px; width:100%;\"></div>            <script type=\"text/javascript\">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById(\"ab736028-8c14-4afb-a863-c412e744de3c\")) {                    Plotly.newPlot(                        \"ab736028-8c14-4afb-a863-c412e744de3c\",                        [{\"alignmentgroup\":\"True\",\"customdata\":[[5800],[5006],[4677],[2240],[2092],[1530],[1363],[1069],[1018],[1017],[973],[823],[798],[743],[737]],\"hovertemplate\":\"<b>Count: </b>%{customdata[0]}\",\"legendgroup\":\"\",\"marker\":{\"color\":\"red\",\"coloraxis\":\"coloraxis\",\"pattern\":{\"shape\":\"\"}},\"name\":\"\",\"offsetgroup\":\"\",\"orientation\":\"v\",\"showlegend\":false,\"textposition\":\"auto\",\"x\":[\"fuck\",\"dumb\",\"nigger\",\"ass\",\"black\",\"white\",\"call\",\"obama\",\"one\",\"peopl\",\"bitch\",\"dont\",\"say\",\"first\",\"get\"],\"xaxis\":\"x\",\"y\":[5800,5006,4677,2240,2092,1530,1363,1069,1018,1017,973,823,798,743,737],\"yaxis\":\"y\",\"type\":\"bar\"}],                        {\"template\":{\"data\":{\"barpolar\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"barpolar\"}],\"bar\":[{\"error_x\":{\"color\":\"rgb(36,36,36)\"},\"error_y\":{\"color\":\"rgb(36,36,36)\"},\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.5},\"pattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2}},\"type\":\"bar\"}],\"carpet\":[{\"aaxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"baxis\":{\"endlinecolor\":\"rgb(36,36,36)\",\"gridcolor\":\"white\",\"linecolor\":\"white\",\"minorgridcolor\":\"white\",\"startlinecolor\":\"rgb(36,36,36)\"},\"type\":\"carpet\"}],\"choropleth\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"choropleth\"}],\"contourcarpet\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"contourcarpet\"}],\"contour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"contour\"}],\"heatmapgl\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmapgl\"}],\"heatmap\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"heatmap\"}],\"histogram2dcontour\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2dcontour\"}],\"histogram2d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"histogram2d\"}],\"histogram\":[{\"marker\":{\"line\":{\"color\":\"white\",\"width\":0.6}},\"type\":\"histogram\"}],\"mesh3d\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"type\":\"mesh3d\"}],\"parcoords\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"parcoords\"}],\"pie\":[{\"automargin\":true,\"type\":\"pie\"}],\"scatter3d\":[{\"line\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatter3d\"}],\"scattercarpet\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattercarpet\"}],\"scattergeo\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergeo\"}],\"scattergl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattergl\"}],\"scattermapbox\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scattermapbox\"}],\"scatterpolargl\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolargl\"}],\"scatterpolar\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterpolar\"}],\"scatter\":[{\"fillpattern\":{\"fillmode\":\"overlay\",\"size\":10,\"solidity\":0.2},\"type\":\"scatter\"}],\"scatterternary\":[{\"marker\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"type\":\"scatterternary\"}],\"surface\":[{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"},\"colorscale\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"type\":\"surface\"}],\"table\":[{\"cells\":{\"fill\":{\"color\":\"rgb(237,237,237)\"},\"line\":{\"color\":\"white\"}},\"header\":{\"fill\":{\"color\":\"rgb(217,217,217)\"},\"line\":{\"color\":\"white\"}},\"type\":\"table\"}]},\"layout\":{\"annotationdefaults\":{\"arrowhead\":0,\"arrowwidth\":1},\"autotypenumbers\":\"strict\",\"coloraxis\":{\"colorbar\":{\"outlinewidth\":1,\"tickcolor\":\"rgb(36,36,36)\",\"ticks\":\"outside\"}},\"colorscale\":{\"diverging\":[[0.0,\"rgb(103,0,31)\"],[0.1,\"rgb(178,24,43)\"],[0.2,\"rgb(214,96,77)\"],[0.3,\"rgb(244,165,130)\"],[0.4,\"rgb(253,219,199)\"],[0.5,\"rgb(247,247,247)\"],[0.6,\"rgb(209,229,240)\"],[0.7,\"rgb(146,197,222)\"],[0.8,\"rgb(67,147,195)\"],[0.9,\"rgb(33,102,172)\"],[1.0,\"rgb(5,48,97)\"]],\"sequential\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]],\"sequentialminus\":[[0.0,\"#440154\"],[0.1111111111111111,\"#482878\"],[0.2222222222222222,\"#3e4989\"],[0.3333333333333333,\"#31688e\"],[0.4444444444444444,\"#26828e\"],[0.5555555555555556,\"#1f9e89\"],[0.6666666666666666,\"#35b779\"],[0.7777777777777778,\"#6ece58\"],[0.8888888888888888,\"#b5de2b\"],[1.0,\"#fde725\"]]},\"colorway\":[\"#1F77B4\",\"#FF7F0E\",\"#2CA02C\",\"#D62728\",\"#9467BD\",\"#8C564B\",\"#E377C2\",\"#7F7F7F\",\"#BCBD22\",\"#17BECF\"],\"font\":{\"color\":\"rgb(36,36,36)\"},\"geo\":{\"bgcolor\":\"white\",\"lakecolor\":\"white\",\"landcolor\":\"white\",\"showlakes\":true,\"showland\":true,\"subunitcolor\":\"white\"},\"hoverlabel\":{\"align\":\"left\"},\"hovermode\":\"closest\",\"mapbox\":{\"style\":\"light\"},\"paper_bgcolor\":\"white\",\"plot_bgcolor\":\"white\",\"polar\":{\"angularaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"radialaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"scene\":{\"xaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"zaxis\":{\"backgroundcolor\":\"white\",\"gridcolor\":\"rgb(232,232,232)\",\"gridwidth\":2,\"linecolor\":\"rgb(36,36,36)\",\"showbackground\":true,\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}},\"shapedefaults\":{\"fillcolor\":\"black\",\"line\":{\"width\":0},\"opacity\":0.3},\"ternary\":{\"aaxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"baxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"},\"bgcolor\":\"white\",\"caxis\":{\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\"}},\"title\":{\"x\":0.05},\"xaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"},\"yaxis\":{\"automargin\":true,\"gridcolor\":\"rgb(232,232,232)\",\"linecolor\":\"rgb(36,36,36)\",\"showgrid\":false,\"showline\":true,\"ticks\":\"outside\",\"title\":{\"standoff\":15},\"zeroline\":false,\"zerolinecolor\":\"rgb(36,36,36)\"}}},\"xaxis\":{\"anchor\":\"y\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"index\"}},\"yaxis\":{\"anchor\":\"x\",\"domain\":[0.0,1.0],\"title\":{\"text\":\"value\"}},\"coloraxis\":{\"colorbar\":{\"title\":{\"text\":\"color\"}},\"colorscale\":[[0.0,\"rgb(255,247,243)\"],[0.125,\"rgb(253,224,221)\"],[0.25,\"rgb(252,197,192)\"],[0.375,\"rgb(250,159,181)\"],[0.5,\"rgb(247,104,161)\"],[0.625,\"rgb(221,52,151)\"],[0.75,\"rgb(174,1,126)\"],[0.875,\"rgb(122,1,119)\"],[1.0,\"rgb(73,0,106)\"]]},\"legend\":{\"tracegroupgap\":0},\"margin\":{\"t\":60},\"barmode\":\"relative\",\"title\":{\"text\":\"Top 15 words for ethnicity\"},\"hovermode\":\"x unified\"},                        {\"responsive\": true}                    ).then(function(){\n",
+              "                            \n",
+              "var gd = document.getElementById('ab736028-8c14-4afb-a863-c412e744de3c');\n",
+              "var x = new MutationObserver(function (mutations, observer) {{\n",
+              "        var display = window.getComputedStyle(gd).display;\n",
+              "        if (!display || display === 'none') {{\n",
+              "            console.log([gd, 'removed!']);\n",
+              "            Plotly.purge(gd);\n",
+              "            observer.disconnect();\n",
+              "        }}\n",
+              "}});\n",
+              "\n",
+              "// Listen for the removal of the full notebook cells\n",
+              "var notebookContainer = gd.closest('#notebook-container');\n",
+              "if (notebookContainer) {{\n",
+              "    x.observe(notebookContainer, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "// Listen for the clearing of the current output cell\n",
+              "var outputEl = gd.closest('.output');\n",
+              "if (outputEl) {{\n",
+              "    x.observe(outputEl, {childList: true});\n",
+              "}}\n",
+              "\n",
+              "                        })                };                            </script>        </div>\n",
+              "</body>\n",
+              "</html>"
+            ]
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.feature_extraction.text import TfidfVectorizer"
+      ],
+      "metadata": {
+        "id": "k9EL39VvtUyf"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X = df['cleaned_text']  # Feature (raw data)\n",
+        "y = df['cyberbullying_type']  # Target Label"
+      ],
+      "metadata": {
+        "id": "JM1m08yBtdkX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, random_state = 42)"
+      ],
+      "metadata": {
+        "id": "sBLDGFGotgWJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "tfidf = TfidfVectorizer(max_features = 5000)  # Using the TF - IDF Vectorizer to extract top 5000 most important features\n",
+        "# from the text data "
+      ],
+      "metadata": {
+        "id": "xd3oxnBKtkjI"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Feature Extraction\n",
+        "X_train_tfidf = tfidf.fit_transform(X_train)  # Creating the vocabulary only from the training set to avoid data leakage from \n",
+        "X_test_tfidf = tfidf.transform(X_test)        # the test set."
+      ],
+      "metadata": {
+        "id": "qhEoUHKGtmcy"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train_tfidf  # Sparse Matrix is created to save memory since many values are close to 0"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dDmUoaLStqXk",
+        "outputId": "dfe3d2d2-81ae-4443-b04d-980c359523d6"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<35043x5000 sparse matrix of type '<class 'numpy.float64'>'\n",
+              "\twith 403374 stored elements in Compressed Sparse Row format>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test_tfidf   # Sparse Matrix"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ldBX-NjPtu_s",
+        "outputId": "b828fb00-7c20-4fd6-a4e3-dfbb8d8aafa2"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<3894x5000 sparse matrix of type '<class 'numpy.float64'>'\n",
+              "\twith 44224 stored elements in Compressed Sparse Row format>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 25
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.preprocessing import StandardScaler\n",
+        "scaler = StandardScaler()\n",
+        "tfidf_array_train = X_train_tfidf.toarray()   # Converting the sparse matrix to a numpy array (dense matrix)\n",
+        "tfidf_array_test = X_test_tfidf.toarray()     # Converting the sparse matrix to a numpy array (dense matrix)\n",
+        "scaled_X_train = scaler.fit_transform(tfidf_array_train)  # Fitting on only training data to avoid data leakage from test data\n",
+        "scaled_X_test = scaler.transform(tfidf_array_test) # and then tranforming both training and testing data"
+      ],
+      "metadata": {
+        "id": "C4GxNyoqtytv"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Performing Dimensionality Reduction using Principal Component Analysis\n",
+        "from sklearn.decomposition import PCA\n",
+        "NUM_COMPONENTS = 5000  # Total number of features\n",
+        "pca = PCA(NUM_COMPONENTS)\n",
+        "reduced = pca.fit(scaled_X_train)"
+      ],
+      "metadata": {
+        "id": "yNEI2s6dt8Bk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "variance_explained = np.cumsum(pca.explained_variance_ratio_)  # Calculating the cumulative explained variance by the components"
+      ],
+      "metadata": {
+        "id": "zOLZlP5RuAlW"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Plotting\n",
+        "fig, ax = plt.subplots(figsize=(8, 6))\n",
+        "plt.plot(range(NUM_COMPONENTS),variance_explained, color='r')\n",
+        "ax.grid(True)\n",
+        "plt.xlabel(\"Number of components\")\n",
+        "plt.ylabel(\"Cumulative explained variance\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NNIC1-iVuEul",
+        "outputId": "3f83d394-5ae0-4aa1-ea5d-f802d655d0ef"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Text(0, 0.5, 'Cumulative explained variance')"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 29
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 576x432 with 1 Axes>"
+            ],
+            "image/png": "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\n"
+          },
+          "metadata": {
+            "needs_background": "light"
+          }
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "final_pca = PCA(0.9)   \n",
+        "reduced_90 = final_pca.fit_transform(scaled_X_train) # Number of Components explaining 90% variance in the training data"
+      ],
+      "metadata": {
+        "id": "LPvSCJ-_vOza"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "reduced_90_test = final_pca.transform(scaled_X_test)"
+      ],
+      "metadata": {
+        "id": "YTNf1hY-vTPB"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "reduced_90.shape"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8jvcUEsZvV6T",
+        "outputId": "628c75ad-336d-4e6b-8151-13ab38d853d5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(35043, 3999)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 32
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "final_pca = PCA(0.8)\n",
+        "reduced_80 = final_pca.fit_transform(scaled_X_train) # Number of Components explaining 80% variance in the training data"
+      ],
+      "metadata": {
+        "id": "3rdAFSCZvaoG"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "reduced_80.shape"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TDRVJPrVvdIX",
+        "outputId": "7f099aa4-1066-4d87-9cdd-0e57fcfaceb6"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(35043, 3290)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# LOGISTIC REGRESSION with the the 90% variance data\n",
+        "from sklearn.linear_model import LogisticRegression\n",
+        "from sklearn.metrics import classification_report,confusion_matrix\n",
+        "log_model_pca = LogisticRegression()\n",
+        "log_model_pca.fit(reduced_90, y_train)\n",
+        "preds_log_model_pca = log_model_pca.predict(reduced_90_test)\n",
+        "print(classification_report(y_test, preds_log_model_pca))\n",
+        "confusion_matrix(log_model_pca, reduced_90_test, y_test)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UvgG2wpix1F3",
+        "outputId": "a7157f7d-c997-4b26-94a1-1c6838241eed"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.9/dist-packages/sklearn/linear_model/_logistic.py:458: ConvergenceWarning:\n",
+            "\n",
+            "lbfgs failed to converge (status=1):\n",
+            "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.\n",
+            "\n",
+            "Increase the number of iterations (max_iter) or scale the data as shown in:\n",
+            "    https://scikit-learn.org/stable/modules/preprocessing.html\n",
+            "Please also refer to the documentation for alternative solver options:\n",
+            "    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression\n",
+            "\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "                   precision    recall  f1-score   support\n",
+            "\n",
+            "              age       0.86      0.83      0.85       766\n",
+            "        ethnicity       0.90      0.85      0.87       801\n",
+            "           gender       0.77      0.79      0.78       788\n",
+            "not_cyberbullying       0.65      0.67      0.66       783\n",
+            "         religion       0.84      0.86      0.85       756\n",
+            "\n",
+            "         accuracy                           0.80      3894\n",
+            "        macro avg       0.80      0.80      0.80      3894\n",
+            "     weighted avg       0.80      0.80      0.80      3894\n",
+            "\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "TypeError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mTypeError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-35-eaadced2a64f>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      6\u001b[0m \u001b[0mpreds_log_model_pca\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mlog_model_pca\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpredict\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mreduced_90_test\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mclassification_report\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0my_test\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mpreds_log_model_pca\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 8\u001b[0;31m \u001b[0mconfusion_matrix\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlog_model_pca\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mreduced_90_test\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my_test\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;31mTypeError\u001b[0m: confusion_matrix() takes 2 positional arguments but 3 were given"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# LOGISTIC REGRESSION with the complete data\n",
+        "from sklearn.experimental import enable_halving_search_cv\n",
+        "from sklearn.model_selection import HalvingGridSearchCV\n",
+        "log_model = LogisticRegression(solver = 'saga')\n",
+        "param_grid = {'C': np.logspace(0, 10, 5)}\n",
+        "grid_log_model = HalvingGridSearchCV(log_model, param_grid = param_grid, n_jobs = -1, min_resources = 'exhaust', factor = 3)\n",
+        "grid_log_model.fit(X_train_tfidf, y_train)\n",
+        "preds_grid_log_model = grid_log_model.predict(X_test_tfidf)\n",
+        "print(classification_report(y_test, preds_grid_log_model))\n",
+        "plot_confusion_matrix(grid_log_model, X_test_tfidf, y_test)"
+      ],
+      "metadata": {
+        "id": "X07DJdzLx-q4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "grid_log_model.best_estimator_ # C = 1"
+      ],
+      "metadata": {
+        "id": "eCNfMTs1yGa1"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# SUPPORT VECTOR MACHINES\n",
+        "from sklearn.svm import LinearSVC\n",
+        "svm_model = LinearSVC()\n",
+        "C = [1e-5, 1e-4, 1e-2, 1e-1, 1]\n",
+        "param_grid = {'C': C}\n",
+        "grid_svm_model = HalvingGridSearchCV(svm_model, param_grid = param_grid, n_jobs = -1, min_resources = 'exhaust', factor = 3)\n",
+        "grid_svm_model.fit(X_train_tfidf, y_train)\n",
+        "preds_grid_svm_model = grid_svm_model.predict(X_test_tfidf)\n",
+        "print(classification_report(y_test, preds_grid_svm_model))\n",
+        "plot_confusion_matrix(grid_svm_model, X_test_tfidf, y_test)"
+      ],
+      "metadata": {
+        "id": "YSZFiLeWyQxD"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "grid_svm_model.best_estimator_"
+      ],
+      "metadata": {
+        "id": "ybsWUgGSySI4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# NEURAL NETWORKS\n",
+        "from sklearn.neural_network import MLPClassifier\n",
+        "nn_model = MLPClassifier(activation = 'logistic', max_iter = 10)  # Sigmoid Activation Function\n",
+        "param_grid = {'learning_rate_init': [0.001, 0.0015, 0.002, 0.0025]}\n",
+        "grid_nn_model = HalvingGridSearchCV(nn_model, param_grid = param_grid, n_jobs = -1, min_resources = 'exhaust', factor = 3)\n",
+        "grid_nn_model.fit(X_train_tfidf, y_train)\n",
+        "preds_grid_nn_model = grid_nn_model.predict(X_test_tfidf)\n",
+        "print(classification_report(y_test, preds_grid_nn_model))\n",
+        "plot_confusion_matrix(grid_nn_model, X_test_tfidf, y_test)"
+      ],
+      "metadata": {
+        "id": "oP7JQnXD1DpJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "grid_nn_model.best_estimator_"
+      ],
+      "metadata": {
+        "id": "WHV2Dgbq1Hmk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# RANDOM FORESTS\n",
+        "from sklearn.ensemble import RandomForestClassifier\n",
+        "rf_model = RandomForestClassifier(random_state = 42)\n",
+        "n_estimators = [64, 100, 128]\n",
+        "bootstrap = [True, False] # Bootstrapping is true by default\n",
+        "param_grid = {'n_estimators': n_estimators, 'bootstrap': bootstrap}\n",
+        "grid_rf_model = HalvingGridSearchCV(rf_model, param_grid = param_grid, n_jobs = -1, min_resources = 'exhaust', factor = 3)\n",
+        "grid_rf_model.fit(X_train_tfidf, y_train)\n",
+        "preds_grid_rf_model = grid_rf_model.predict(X_test_tfidf)\n",
+        "print(classification_report(y_test, preds_grid_rf_model))\n",
+        "plot_confusion_matrix(grid_rf_model, X_test_tfidf, y_test)"
+      ],
+      "metadata": {
+        "id": "3s_OC1NZ1_gb"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "RXuoEpVA2FFH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# NAIVE - BAYES\n",
+        "from sklearn.naive_bayes import MultinomialNB\n",
+        "nb_model = MultinomialNB()\n",
+        "nb_model.fit(X_train_tfidf, y_train)\n",
+        "preds_nb_model = nb_model.predict(X_test_tfidf)\n",
+        "print(classification_report(y_test, preds_nb_model))\n",
+        "plot_confusion_matrix(nb_model, X_test_tfidf, y_test)"
+      ],
+      "metadata": {
+        "id": "lgT2qRqE2Hoy"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Creating a pipeline\n",
+        "from sklearn.pipeline import Pipeline\n",
+        "pipe = Pipeline([('tfidf', TfidfVectorizer(max_features = 5000)), ('rf_model', RandomForestClassifier(n_estimators = 128, random_state = 42))])\n",
+        "pipe.fit(X, y)"
+      ],
+      "metadata": {
+        "id": "OnpWFFpY2LMO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pipe.predict([\"@abc Hey man! Great match today. Your smashes were spot on. Let's continue playing together. \\\n",
+        "               #badminton #brotherhood #men #doubles\"])"
+      ],
+      "metadata": {
+        "id": "vmuswQUu2iyS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pipe.predict([\"Going to Africa. Hope I don't get AIDS. Just kidding. I'm white!\"])"
+      ],
+      "metadata": {
+        "id": "jmRaqT0L2mfg"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pipe.predict([\"Muslims should be punished. We are not doing enough to rid us of those filthy animals.\"])"
+      ],
+      "metadata": {
+        "id": "0v_Lo0BX2zqB"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pipe.predict([\"@abc Man you don't have any facial hair. You look like a fucking 9 year old school boy! #clown #idiot\"])"
+      ],
+      "metadata": {
+        "id": "neHZPE2p23eC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "pipe.predict([\"@abc shut up gay boy\"])"
+      ],
+      "metadata": {
+        "id": "5841wJbA28s0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "XUz7NLJ-3C_K"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
